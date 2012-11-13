@@ -29,6 +29,15 @@ InsideCornerRadius = 1;
 // Render Resolution
 CornerResolution = 50;
 
+// Key Dimensions
+KeyDepth = 2.5;
+KeyWidth = 6;
+KeyLength = Depth;
+KeyCutout = KeyWidth+2;
+
+// Fastener Dimensions
+FastenerDia = 5.5;
+
 // Adjusted x-Axis Thickness
 /*
 Given the way we define our trapezoids using cylindars enclosed by a hull,
@@ -54,12 +63,15 @@ ____________________________
        <--BotWidth-->
 */
 
-// Ruler for debug.
+// Create a ruler for debug.
 use <ruler.scad>
-%xyzruler(Length/2+5);
+translate([0,-Length/2,Depth]) %xyzruler(Length+Thick);
 
 // Create a rounded trapezoid extrusion. This is used to build a trapezoid box
 // with wall thickness of zero.
+// 1. Place the four corners in two dimensions using circles.
+// 2. Create a rounded hull around the corners.
+// 3. Extrude the rounded trapezoid to three dimensions.
 
 module roundedTrapExtrusion(size, r1, r2, resolution)
 	{
@@ -91,11 +103,39 @@ module roundedTrapExtrusion(size, r1, r2, resolution)
 
 difference()
 	{
-	color("green")
-	roundedTrapExtrusion([TopWidth,BotWidth,Length,Depth],TopCornerRadius,BotCornerRadius,CornerResolution);
+	union()
+		{
+	difference()
+		{
+		// Create and extrude the outer trapizod box.
+		color("green")
+		roundedTrapExtrusion([TopWidth,BotWidth,Length,Depth],
+		TopCornerRadius,BotCornerRadius,CornerResolution);
 
-	color("blue")
-	translate([0,0,Thick])
-	roundedTrapExtrusion([TopWidth-(xThick * 2),BotWidth-(Thick * 2),Length-(Thick * 2),Depth],InsideCornerRadius,InsideCornerRadius,CornerResolution);
+		// Create and extrude the inner trapizoid box, and subtract it from the outer.
+		color("blue")
+		translate([0,0,Thick])
+		roundedTrapExtrusion([TopWidth-(xThick * 2),BotWidth-(Thick * 2),
+		Length-(Thick * 2),Depth],InsideCornerRadius,InsideCornerRadius,
+		CornerResolution);
+		}
+
+	// Create and extrude the rail alignment key.
+	// Ramp the edge of the key so that it can be printed.
+	translate([-TopWidth/2,-(Length)/2-KeyDepth,Depth/2-KeyWidth/2])
+	rotate([90,0,90])
+	difference()
+		{
+		linear_extrude(height = TopWidth)
+		polygon(points=[[0,KeyDepth],[KeyDepth,0],[KeyDepth,KeyWidth],[0,KeyWidth]]);
+		color("red")
+		translate([-KeyCutout/2,(KeyWidth-KeyCutout)/2,(TopWidth-KeyCutout)/2])
+		cube([KeyCutout,KeyCutout,KeyCutout]);
+		}
 	}
 
+	// Bore a hole for the fasteners.
+	rotate([90,0,0])
+	translate([0,Depth/2,-(Length+Thick)/2])
+	cylinder(h=Length+KeyDepth+5,r=FastenerDia/2,$fn=100);
+	} 
