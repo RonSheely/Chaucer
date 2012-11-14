@@ -15,7 +15,7 @@ tend to misbehave.
 // Here are the parameters in mm.
 
 // Basic Dimensions
-TopWidth = 40;
+TopWidth = 55;
 BotWidth = 25;
 Length = 55;
 Depth = 20;
@@ -29,7 +29,7 @@ InsideCornerRadius = 1;
 // Render Resolution
 CornerResolution = 50;
 
-// Key Dimensions
+// Alignment Key Dimensions
 KeyDepth = 2.5;
 KeyWidth = 6;
 KeyLength = Depth;
@@ -124,6 +124,7 @@ difference()
 	// Ramp the edge of the key so that it can be printed.
 	translate([-TopWidth/2,-(Length)/2-KeyDepth,Depth/2-KeyWidth/2])
 	rotate([90,0,90])
+	// Leave a cutout to clear the fastener.
 	difference()
 		{
 		linear_extrude(height = TopWidth)
@@ -139,3 +140,9 @@ difference()
 	translate([0,Depth/2,-(Length+Thick)/2])
 	cylinder(h=Length+KeyDepth+5,r=FastenerDia/2,$fn=100);
 	} 
+
+	// Add the toe.
+	translate([0,Length/2,Depth/2])
+	rotate([-90,0,0])
+	rotate_extrude($fn=100)
+	polygon(points=[[0,0],[1,0],[1,1],[3,1],[3,5],[5,5],[8,0]]);
