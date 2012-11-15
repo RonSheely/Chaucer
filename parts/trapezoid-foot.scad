@@ -14,10 +14,10 @@ tend to misbehave.
 
 // Here are the parameters in mm.
 
-// Basic Dimensions
-TopWidth = 55;
+// Base Dimensions
+TopWidth = 45;
 BotWidth = 25;
-Length = 55;
+Length = 50;
 Depth = 20;
 Thick = 4;
 
@@ -30,13 +30,19 @@ InsideCornerRadius = 1;
 CornerResolution = 50;
 
 // Alignment Key Dimensions
-KeyDepth = 2.5;
+KeyDepth = 2;
 KeyWidth = 6;
 KeyLength = Depth;
 KeyCutout = KeyWidth+2;
 
 // Fastener Dimensions
-FastenerDia = 5.5;
+FastenerDia = 5;
+
+// Toe Dimensions
+ToeLength = 5;
+ToeFlat = 1;
+ToeInsideDia = 8;
+ToeOutsideDia = 18;
 
 // Adjusted x-Axis Thickness
 /*
@@ -65,7 +71,7 @@ ____________________________
 
 // Create a ruler for debug.
 use <ruler.scad>
-translate([0,-Length/2,Depth]) %xyzruler(Length+Thick);
+translate([0,-Length/2,Depth]) %xyzruler(Length+ToeLength);
 
 // Create a rounded trapezoid extrusion. This is used to build a trapezoid box
 // with wall thickness of zero.
@@ -145,4 +151,8 @@ difference()
 	translate([0,Length/2,Depth/2])
 	rotate([-90,0,0])
 	rotate_extrude($fn=100)
-	polygon(points=[[0,0],[1,0],[1,1],[3,1],[3,5],[5,5],[8,0]]);
+	polygon(points=[
+	[ToeInsideDia/2,0],
+	[ToeInsideDia/2,ToeLength],
+	[ToeInsideDia/2+ToeFlat,ToeLength],
+	[ToeOutsideDia/2,0]]);
