@@ -17,7 +17,7 @@ tend to misbehave.
 // Base Dimensions
 TopWidth = 45;
 BotWidth = 25;
-Length = 50;
+Length = 55;
 Depth = 20;
 Thick = 4;
 
@@ -39,10 +39,13 @@ KeyCutout = KeyWidth+2;
 FastenerDia = 5;
 
 // Toe Dimensions
+// revisit - I am not printing the toe until I can find a way to
+// prevent it from warping during printing.
 ToeLength = 5;
 ToeFlat = 1;
 ToeInsideDia = 8;
 ToeOutsideDia = 18;
+
 
 // Adjusted x-Axis Thickness
 /*
@@ -118,7 +121,8 @@ difference()
 		roundedTrapExtrusion([TopWidth,BotWidth,Length,Depth],
 		TopCornerRadius,BotCornerRadius,CornerResolution);
 
-		// Create and extrude the inner trapizoid box, and subtract it from the outer.
+		// Create and extrude the inner trapizoid box, and subtract it
+		// from the outer.
 		color("blue")
 		translate([0,0,Thick])
 		roundedTrapExtrusion([TopWidth-(xThick * 2),BotWidth-(Thick * 2),
@@ -148,6 +152,9 @@ difference()
 	} 
 
 	// Add the toe.
+	// revisit - The toe warps during printing, so I'm commenting it out until
+	// I can develop suitible scafolding.
+/*
 	translate([0,Length/2,Depth/2])
 	rotate([-90,0,0])
 	rotate_extrude($fn=100)
@@ -156,3 +163,4 @@ difference()
 	[ToeInsideDia/2,ToeLength],
 	[ToeInsideDia/2+ToeFlat,ToeLength],
 	[ToeOutsideDia/2,0]]);
+*/
