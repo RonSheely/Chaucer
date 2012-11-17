@@ -13,18 +13,19 @@ tend to misbehave.
 */
 
 // Here are the parameters in mm.
+// Keep in mind the foot is printed on its back.
 
 // Base Dimensions
-TopWidth = 45;
-BotWidth = 25;
+BaseWidth = 45;
+FootWidth = 25;
 Length = 55;
 Depth = 20;
 Thick = 4;
 
 // Radii
-TopCornerRadius = 0.1;
-BotCornerRadius = 1;
-InsideCornerRadius = 1;
+BaseCornerRadius = 0.1;
+FootCornerRadius = 1.0;
+InsideCornerRadius = 2;
 
 // Render Resolution
 CornerResolution = 50;
@@ -50,31 +51,37 @@ ToeOutsideDia = 18;
 // Adjusted x-Axis Thickness
 /*
 Given the way we define our trapezoids using cylindars enclosed by a hull,
-we cannot simply scale the inner box to fit nicely inside the outer box,
+we cannot simply scale the inner box to fit nicely inside the outer box
 with uniform wall thickness. We must calculate the vertices of the inner
 trapezoid. The vertical (y) components of the verticies are obvious. They
-are simply the given Thick along the y or Length axis. The horizontal (x)
-components are given by the trigonmetric relationship below.
+are simply the given thickness (Thick) along the y or Length axis. The
+horizontal (x) components are given by the trigonmetric relationships below.
 */
-xThick = Thick/tan(atan(Length/(TopWidth/2-BotWidth/2))/2);
-echo("xThick: ",xThick); // For debug. Should be slighly more than Thick.
+xBaseThick = Thick/tan(atan(Length/(BaseWidth/2-FootWidth/2))/2);
+echo("xBaseThick: ",xBaseThick);
+xFootThick = Thick + Thick*tan(90 + atan(Length/(BaseWidth/2-FootWidth/2)));
+echo("xFootThick: ",xFootThick);
+
 
 /*
-<---------TopWidth--------->
-____________________________ 
-\   ____________________   /  ^
- \  \                  /  /   |
-  \  \                /  /    |
- ->\  \<-xThick      /  /   Length
-    \  \            /  /      |
-     \  \__________/  /       |
-      \______________/        V
-       <--BotWidth-->
+<---------BaseWidth--------->
+_____________________________ 
+\   _____________________   /  ^
+ \  \                   /  /   |
+->\  \<-xBaseThick     /  /    |
+ ->\  \               /  /   Length
+  ->\  \<-xFootThick /  /      |
+     \  \___________/  /       |
+      \_______________/        V
+       <--FootWidth-->
 */
 
 // Create a ruler for debug.
 use <ruler.scad>
-translate([0,-Length/2,Depth]) %xyzruler(Length+ToeLength);
+translate([0,-Length/2,Depth])
+// translate([0,-22,Depth])
+// rotate(-atan(Length/(BaseWidth/2-FootWidth/2)),0,0)
+%xyzruler(Length+ToeLength);
 
 // Create a rounded trapezoid extrusion. This is used to build a trapezoid box
 // with wall thickness of zero.
@@ -82,79 +89,104 @@ translate([0,-Length/2,Depth]) %xyzruler(Length+ToeLength);
 // 2. Create a rounded hull around the corners.
 // 3. Extrude the rounded trapezoid to three dimensions.
 
-module roundedTrapExtrusion(size, r1, r2, resolution)
+module RoundTrapExtrude(p1,p2,p3,p4,depth,res)
 	{
-	x1 = size[0];
-	x2 = size[1];
-	y = size[2];
-	z = size[3];
+	// Lower Left, p1
+	x1 = p1[0];
+	y1 = p1[1];
+	r1 = p1[2];
 
-	linear_extrude(height=z)
+	// Upper Left, p2
+	x2 = p2[0];
+	y2 = p2[1];
+	r2 = p2[2];
+
+	// Upper Right, p3
+	x3 = p3[0];
+	y3 = p3[1];
+	r3 = p3[2];
+
+	// Lower Right, p4
+	x4 = p4[0];
+	y4 = p4[1];
+	r4 = p4[2];
+
+	linear_extrude(height=depth)
 	hull()
 		{
 		// Place 4 circles at the corners, with the given radius
 
-		translate([(-x1/2)+(r1), (-y/2)+(r1), 0])
-		circle(r=r1, $fn=resolution);
+		// Lower Left, p1
+		translate([x1+r1, y1+r1, 0])
+		circle(r=r1, $fn=res);
 
-		translate([(x1/2)-(r1), (-y/2)+(r1), 0])
-		circle(r=r1, $fn=resolution);
+		// Upper Left, p2
+		translate([x2+r2, y2-r2, 0])
+		circle(r=r2, $fn=res);
 
-		translate([(-x2/2)+(r2), (y/2)-(r2), 0])
-		circle(r=r2, $fn=resolution);
+		// Upper Right, p3
+		translate([x3-r3, y3-r3, 0])
+		circle(r=r3, $fn=res);
 
-		translate([(x2/2)-(r2), (y/2)-(r2), 0])
-		circle(r=r2, $fn=resolution);
+		// Lower Right, p4
+		translate([x4-r4, y4+r4, 0])
+		circle(r=r4, $fn=res);
 		}
 	}
 
-// Construct the foot.
+// Construct an inverted box truss foot.
 
 difference()
 	{
 	union()
 		{
-	difference()
-		{
-		// Create and extrude the outer trapizod box.
-		color("green")
-		roundedTrapExtrusion([TopWidth,BotWidth,Length,Depth],
-		TopCornerRadius,BotCornerRadius,CornerResolution);
-
-		// Create and extrude the inner trapizoid box, and subtract it
-		// from the outer.
-		color("blue")
-		translate([0,0,Thick])
-		roundedTrapExtrusion([TopWidth-(xThick * 2),BotWidth-(Thick * 2),
-		Length-(Thick * 2),Depth],InsideCornerRadius,InsideCornerRadius,
-		CornerResolution);
+		difference()
+			{
+			// Construct the outer trapezoid.
+			color("green")
+			RoundTrapExtrude(
+				[-BaseWidth/2,-Length/2,BaseCornerRadius], // LL
+				[-FootWidth/2, Length/2,FootCornerRadius], // UL
+				[ FootWidth/2, Length/2,FootCornerRadius], // UR
+				[ BaseWidth/2,-Length/2,BaseCornerRadius], // LR
+				Depth,CornerResolution);
+		
+			// Mill out the inner trapezoid.
+			color("blue")
+			translate([0,0,Thick])
+			RoundTrapExtrude(
+				[-BaseWidth/2+xBaseThick,-Length/2+Thick,InsideCornerRadius], // LL
+				[-FootWidth/2+xFootThick, Length/2-Thick,InsideCornerRadius], // UL
+				[ FootWidth/2-xFootThick, Length/2-Thick,InsideCornerRadius], // UR
+				[ BaseWidth/2-xBaseThick,-Length/2+Thick,InsideCornerRadius], // LR
+				Depth,CornerResolution);
+			}
+	
+		// Create the rail alignment key, and weld it to the base.
+		// Ramp the edge of the key so that it can be printed.
+		translate([-BaseWidth/2,-(Length)/2-KeyDepth,Depth/2-KeyWidth/2])
+		rotate([90,0,90])
+		// Mill out a space to clear the fastener.
+		difference()
+			{
+			linear_extrude(height = BaseWidth)
+			polygon(points=[[0,KeyDepth],[KeyDepth,0],[KeyDepth,KeyWidth],[0,KeyWidth]]);
+			color("red")
+			translate([-KeyCutout/2,(KeyWidth-KeyCutout)/2,(BaseWidth-KeyCutout)/2])
+			cube([KeyCutout,KeyCutout,KeyCutout]);
+			}
 		}
 
-	// Create and extrude the rail alignment key.
-	// Ramp the edge of the key so that it can be printed.
-	translate([-TopWidth/2,-(Length)/2-KeyDepth,Depth/2-KeyWidth/2])
-	rotate([90,0,90])
-	// Leave a cutout to clear the fastener.
-	difference()
-		{
-		linear_extrude(height = TopWidth)
-		polygon(points=[[0,KeyDepth],[KeyDepth,0],[KeyDepth,KeyWidth],[0,KeyWidth]]);
-		color("red")
-		translate([-KeyCutout/2,(KeyWidth-KeyCutout)/2,(TopWidth-KeyCutout)/2])
-		cube([KeyCutout,KeyCutout,KeyCutout]);
-		}
-	}
-
-	// Bore a hole for the fasteners.
+	// Mill holes for the fasteners.
 	rotate([90,0,0])
 	translate([0,Depth/2,-(Length+Thick)/2])
 	cylinder(h=Length+KeyDepth+5,r=FastenerDia/2,$fn=100);
-	} 
 
-	// Add the toe.
+
+	// Create the toe, and weld it to the foot.
 	// revisit - The toe warps during printing, so I'm commenting it out until
 	// I can develop suitible scafolding.
-/*
+	/*
 	translate([0,Length/2,Depth/2])
 	rotate([-90,0,0])
 	rotate_extrude($fn=100)
@@ -163,4 +195,6 @@ difference()
 	[ToeInsideDia/2,ToeLength],
 	[ToeInsideDia/2+ToeFlat,ToeLength],
 	[ToeOutsideDia/2,0]]);
-*/
+	*/
+	}
+
