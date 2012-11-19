@@ -15,12 +15,23 @@ tend to misbehave.
 // Here are the parameters in mm.
 // Keep in mind the foot is printed on its back.
 
-// Base Dimensions
+// Total Length of Foot and Toe
+TotalLength = 55;
+echo("TotalLength: ",TotalLength);
+
+// Toe Dimensions
+ToeLength = 10;
+ToeFlat = 1;
+ToeInsideDia = 8;
+ToeOutsideDia = 18;
+
+// Foot Dimensions
 BaseWidth = 45;
 FootWidth = 25;
-Length = 55;
-Depth = 20;
-Thick = 4;
+FootLength = TotalLength - ToeLength;
+echo("FootLength: ",FootLength);
+FootDepth = 20;
+FootThick = 4;
 
 // Radii
 BaseCornerRadius = 0.1;
@@ -33,20 +44,11 @@ CornerResolution = 50;
 // Alignment Key Dimensions
 KeyDepth = 2;
 KeyWidth = 6;
-KeyLength = Depth;
+KeyLength = FootDepth;
 KeyCutout = KeyWidth+2;
 
 // Fastener Dimensions
 FastenerDia = 5;
-
-// Toe Dimensions
-// revisit - I am not printing the toe until I can find a way to
-// prevent it from warping during printing.
-ToeLength = 5;
-ToeFlat = 1;
-ToeInsideDia = 8;
-ToeOutsideDia = 18;
-
 
 // Adjusted x-Axis Thickness
 /*
@@ -54,12 +56,12 @@ Given the way we define our trapezoids using cylindars enclosed by a hull,
 we cannot simply scale the inner box to fit nicely inside the outer box
 with uniform wall thickness. We must calculate the vertices of the inner
 trapezoid. The vertical (y) components of the verticies are obvious. They
-are simply the given thickness (Thick) along the y or Length axis. The
+are simply the given thickness (FootThick) along the y or FootLength axis. The
 horizontal (x) components are given by the trigonmetric relationships below.
 */
-xBaseThick = Thick/tan(atan(Length/(BaseWidth/2-FootWidth/2))/2);
+xBaseThick = FootThick/tan(atan(FootLength/(BaseWidth/2-FootWidth/2))/2);
 echo("xBaseThick: ",xBaseThick);
-xFootThick = Thick + Thick*tan(90 + atan(Length/(BaseWidth/2-FootWidth/2)));
+xFootThick = FootThick + FootThick*tan(90 + atan(FootLength/(BaseWidth/2-FootWidth/2)));
 echo("xFootThick: ",xFootThick);
 
 
@@ -69,7 +71,7 @@ _____________________________
 \   _____________________   /  ^
  \  \                   /  /   |
 ->\  \<-xBaseThick     /  /    |
- ->\  \               /  /   Length
+ ->\  \               /  /   FootLength
   ->\  \<-xFootThick /  /      |
      \  \___________/  /       |
       \_______________/        V
@@ -78,10 +80,10 @@ _____________________________
 
 // Create a ruler for debug.
 use <ruler.scad>
-translate([0,-Length/2,Depth])
-// translate([0,-22,Depth])
-// rotate(-atan(Length/(BaseWidth/2-FootWidth/2)),0,0)
-%xyzruler(Length+ToeLength);
+translate([0,-FootLength/2,FootDepth])
+// translate([0,-22,FootDepth])
+// rotate(-atan(FootLength/(BaseWidth/2-FootWidth/2)),0,0)
+%xyzruler(FootLength+ToeLength);
 
 // Create a rounded trapezoid extrusion. This is used to build a trapezoid box
 // with wall thickness of zero.
@@ -144,25 +146,25 @@ difference()
 			{
 			// Construct the outer trapezoid.
 			RoundTrapExtrude(
-				[-BaseWidth/2,-Length/2,BaseCornerRadius], // LL
-				[-FootWidth/2, Length/2,FootCornerRadius], // UL
-				[ FootWidth/2, Length/2,FootCornerRadius], // UR
-				[ BaseWidth/2,-Length/2,BaseCornerRadius], // LR
-				Depth,CornerResolution);
+				[-BaseWidth/2,-FootLength/2,BaseCornerRadius], // LL
+				[-FootWidth/2, FootLength/2,FootCornerRadius], // UL
+				[ FootWidth/2, FootLength/2,FootCornerRadius], // UR
+				[ BaseWidth/2,-FootLength/2,BaseCornerRadius], // LR
+				FootDepth,CornerResolution);
 		
 			// Mill out the inner trapezoid.
-			translate([0,0,Thick])
+			translate([0,0,FootThick])
 			RoundTrapExtrude(
-				[-BaseWidth/2+xBaseThick,-Length/2+Thick,InsideCornerRadius], // LL
-				[-FootWidth/2+xFootThick, Length/2-Thick,InsideCornerRadius], // UL
-				[ FootWidth/2-xFootThick, Length/2-Thick,InsideCornerRadius], // UR
-				[ BaseWidth/2-xBaseThick,-Length/2+Thick,InsideCornerRadius], // LR
-				Depth,CornerResolution);
+				[-BaseWidth/2+xBaseThick,-FootLength/2+FootThick,InsideCornerRadius], // LL
+				[-FootWidth/2+xFootThick, FootLength/2-FootThick,InsideCornerRadius], // UL
+				[ FootWidth/2-xFootThick, FootLength/2-FootThick,InsideCornerRadius], // UR
+				[ BaseWidth/2-xBaseThick,-FootLength/2+FootThick,InsideCornerRadius], // LR
+				FootDepth,CornerResolution);
 			}
 	
 		// Create the rail alignment key, and weld it to the base.
 		// Ramp the edge of the key so that it can be printed.
-		translate([-BaseWidth/2,-(Length)/2-KeyDepth,Depth/2-KeyWidth/2])
+		translate([-BaseWidth/2,-(FootLength)/2-KeyDepth,FootDepth/2-KeyWidth/2])
 		rotate([90,0,90])
 		// Mill out a space to clear the fastener.
 		difference()
@@ -175,8 +177,9 @@ difference()
 
 		// Create the toe, and weld it to the foot.
 		// revisit - The toe warps during printing, so I'm disabling it until
-		// suitible scafolding and be developed.
-		* translate([0,Length/2,Depth/2])
+		// suitible scafolding and be developed. I'm using a factory rubber foot
+		// with approximately the same dimensions for the interim.
+		% translate([0,FootLength/2,FootDepth/2])
 		rotate([-90,0,0])
 		rotate_extrude($fn=100)
 		polygon(points=[
@@ -190,25 +193,25 @@ difference()
 		* union()
 			{
 			color("red")
-			translate([4.5,Length/2+8,Depth/2])
-			cube([0.5,16,Depth],center = true);
+			translate([4.5,FootLength/2+8,FootDepth/2])
+			cube([0.5,16,FootDepth],center = true);
 			color("green")
-			translate([0,Length/2+8,Depth/2])
-			cube([0.5,16,Depth],center = true);
+			translate([0,FootLength/2+8,FootDepth/2])
+			cube([0.5,16,FootDepth],center = true);
 			color("blue")
-			translate([-4.5,Length/2+8,Depth/2])
-			cube([0.5,16,Depth],center = true);
+			translate([-4.5,FootLength/2+8,FootDepth/2])
+			cube([0.5,16,FootDepth],center = true);
 			}
 		}
 
 	// Mill a hole for the base fastener.
 	rotate([90,0,0])
-	translate([0,Depth/2,Length/2-2*Thick])
-	cylinder(h=3*Thick,r=FastenerDia/2,$fn=100);
+	translate([0,FootDepth/2,FootLength/2-2*FootThick])
+	cylinder(h=3*FootThick,r=FastenerDia/2,$fn=100);
 
 	// Mill a hole for the foot fastener.
 	rotate([90,0,0])
-	translate([0,Depth/2,-Length/2-Thick/2])
-	cylinder(h=2*Thick,r=FastenerDia/2,$fn=100);
+	translate([0,FootDepth/2,-FootLength/2-FootThick/2])
+	cylinder(h=2*FootThick,r=FastenerDia/2,$fn=100);
 	}
 
