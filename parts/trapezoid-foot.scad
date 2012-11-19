@@ -143,7 +143,6 @@ difference()
 		difference()
 			{
 			// Construct the outer trapezoid.
-			color("green")
 			RoundTrapExtrude(
 				[-BaseWidth/2,-Length/2,BaseCornerRadius], // LL
 				[-FootWidth/2, Length/2,FootCornerRadius], // UL
@@ -152,7 +151,6 @@ difference()
 				Depth,CornerResolution);
 		
 			// Mill out the inner trapezoid.
-			color("blue")
 			translate([0,0,Thick])
 			RoundTrapExtrude(
 				[-BaseWidth/2+xBaseThick,-Length/2+Thick,InsideCornerRadius], // LL
@@ -171,30 +169,46 @@ difference()
 			{
 			linear_extrude(height = BaseWidth)
 			polygon(points=[[0,KeyDepth],[KeyDepth,0],[KeyDepth,KeyWidth],[0,KeyWidth]]);
-			color("red")
 			translate([-KeyCutout/2,(KeyWidth-KeyCutout)/2,(BaseWidth-KeyCutout)/2])
 			cube([KeyCutout,KeyCutout,KeyCutout]);
 			}
+
+		// Create the toe, and weld it to the foot.
+		// revisit - The toe warps during printing, so I'm disabling it until
+		// suitible scafolding and be developed.
+		* translate([0,Length/2,Depth/2])
+		rotate([-90,0,0])
+		rotate_extrude($fn=100)
+		polygon(points=[
+		[ToeInsideDia/2,0],
+		[ToeInsideDia/2,ToeLength],
+		[ToeInsideDia/2+ToeFlat,ToeLength],
+		[ToeOutsideDia/2,0]]);
+
+		// Add scaffoldilng for the toe.
+		// This has not been tested, so I'm disabling it.
+		* union()
+			{
+			color("red")
+			translate([4.5,Length/2+8,Depth/2])
+			cube([0.5,16,Depth],center = true);
+			color("green")
+			translate([0,Length/2+8,Depth/2])
+			cube([0.5,16,Depth],center = true);
+			color("blue")
+			translate([-4.5,Length/2+8,Depth/2])
+			cube([0.5,16,Depth],center = true);
+			}
 		}
 
-	// Mill holes for the fasteners.
+	// Mill a hole for the base fastener.
 	rotate([90,0,0])
-	translate([0,Depth/2,-(Length+Thick)/2])
-	cylinder(h=Length+KeyDepth+5,r=FastenerDia/2,$fn=100);
+	translate([0,Depth/2,Length/2-2*Thick])
+	cylinder(h=3*Thick,r=FastenerDia/2,$fn=100);
 
-
-	// Create the toe, and weld it to the foot.
-	// revisit - The toe warps during printing, so I'm commenting it out until
-	// I can develop suitible scafolding.
-	/*
-	translate([0,Length/2,Depth/2])
-	rotate([-90,0,0])
-	rotate_extrude($fn=100)
-	polygon(points=[
-	[ToeInsideDia/2,0],
-	[ToeInsideDia/2,ToeLength],
-	[ToeInsideDia/2+ToeFlat,ToeLength],
-	[ToeOutsideDia/2,0]]);
-	*/
+	// Mill a hole for the foot fastener.
+	rotate([90,0,0])
+	translate([0,Depth/2,-Length/2-Thick/2])
+	cylinder(h=2*Thick,r=FastenerDia/2,$fn=100);
 	}
 
