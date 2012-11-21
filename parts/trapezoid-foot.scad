@@ -45,7 +45,7 @@ CornerResolution = 50;
 KeyDepth = 2;
 KeyWidth = 6;
 KeyLength = FootDepth;
-KeyCutout = KeyWidth+2;
+KeyCutout = 12;
 
 // Fastener Dimensions
 FastenerDia = 5;
