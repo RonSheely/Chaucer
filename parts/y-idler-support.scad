@@ -25,7 +25,7 @@ ToeLength = 22;
 WingWidth = 37;
 
 Resolution = 50;
-Radius = 0.5;
+Radius = 1;
 FastenerDia = 5;
 
 ToeBracketLength = 30;
@@ -120,5 +120,9 @@ union()
 		translate([IdlerBracketWidth/2,IdlerBracketLength,-1])
 		cylinder(r=IdlerFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
+	
+	// Weld a block to connect the idler pully bracket to base and toe.
+	translate([0,ToeLength-IdlerBracketThick,0])
+	cube([WingWidth+ToeIn,Thick+1,Thick]);
 	}
 
