@@ -12,7 +12,7 @@ As per OpenScad default, dimensions are in mm and degrees.
 
 // Create a ruler for debug.
 use <ruler.scad>
-% translate([0,0,0])
+% translate([10,10,10])
 rotate([0,0,0])
 xyzruler(30);
 
@@ -22,20 +22,21 @@ BaseLength = 20;
 ToeWidth = 50;
 ToeIn = (BaseWidth-ToeWidth)/2;
 ToeLength = 22;
-WingWidth = 37;
+WingWidth = 35;
 
 Resolution = 50;
 Radius = 1;
-FastenerDia = 5;
+BaseFastenerDia = 5;
+FootFastenerDia = 5;
 
 ToeBracketLength = 30;
 ToeBracketWidth = 16;
 ToeBracketThick = 8;
 
-IdlerBracketLength = 24;
-IdlerBracketWidth = 24;
+IdlerBracketLength = 21;
+IdlerBracketWidth = 21;
 IdlerBracketThick = 10;
-IdlerFastenerDia = 3;
+IdlerFastenerDia = 2.5;
 
 // Place the vertices clockwise, starting from the lower left vertex.
 
@@ -53,9 +54,8 @@ union()
 		[WingWidth+ToeIn,0], // P6
 		[WingWidth,ToeLength]]); // P7
 	
-		// Make a rounding corner at P1
-		/*
-		translate([Radius,Radius+ToeLength,0])
+		// Make a rounding corner at P1 - disabled
+		* translate([Radius,Radius+ToeLength,0])
 		rotate([0,0,180])
 		difference()
 			{
@@ -64,7 +64,6 @@ union()
 			translate([0,0,-2])
 			cylinder(r=Radius,h=Thick+4,$fn=Resolution);
 			}
-		*/
 
 		// Make a rounding corner at P2
 		translate([Radius,ToeLength+BaseLength-Radius,0])
@@ -90,9 +89,9 @@ union()
 	
 		// Drill holes for the mounting fasteners.
 		translate([WingWidth+BaseWidth-10,ToeLength+BaseLength-10,-1])
-		cylinder(r=FastenerDia/2,h=Thick+4,$fn=Resolution);
+		cylinder(r=BaseFastenerDia/2,h=Thick+4,$fn=Resolution);
 		translate([WingWidth+BaseWidth-10-40,ToeLength+BaseLength-10,-1])
-		cylinder(r=FastenerDia/2,h=Thick+4,$fn=Resolution);
+		cylinder(r=BaseFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
 
 	// Weld on the toe bracket.
@@ -103,7 +102,7 @@ union()
 		// Drill a hole for the toe fastener.
 		rotate([-90,0,0])
 		translate([WingWidth+BaseWidth/2,-Thick-ToeBracketWidth/2,-1])
-		cylinder(r=FastenerDia/2,h=Thick+4,$fn=Resolution);
+		cylinder(r=FootFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
 
 	// Weld on the idler pully bracket.
