@@ -6,7 +6,8 @@ This is trapezoid box inverted truss used as the rear feet for the Chaucer
 Dave Kennell's Pocker Printer Design on Thingiverse. The foot is essentially
 comprised of rounded concentric trapezoid boxes.
 
-Todo: Refactor this mess to make it more generic and usable.
+Todo: Refactor this mess to make it more generic and usable with parametric
+modules.
 Todo: Find a thickness solution that does not use Tan or ATan. Tan and ATan
 tend to misbehave.
 
@@ -52,7 +53,7 @@ FastenerDia = 5;
 
 // Adjusted x-Axis Thickness
 /*
-Given the way we define our trapezoids using cylindars enclosed by a hull,
+Given the way we define our trapezoids using cylinders enclosed by a hull,
 we cannot simply scale the inner box to fit nicely inside the outer box
 with uniform wall thickness. We must calculate the vertices of the inner
 trapezoid. The vertical (y) components of the verticies are obvious. They
@@ -175,10 +176,13 @@ difference()
 			cube([KeyCutout,KeyCutout,KeyCutout]);
 			}
 
-		// Create the toe, and weld it to the foot.
+		// Create the toe, and weld it to the foot. The toe is designed to
+		// accept custom non-skid rubber or RTV feet.
 		// revisit - The toe warps during printing, so I'm disabling it until
 		// suitible scafolding and be developed. I'm using a factory rubber foot
-		// with approximately the same dimensions for the interim.
+		// with approximately the same dimensions for the interim. Perhaps the
+		// toe could be printed as a separate part, and fastened during final
+		// assembly.
 		% translate([0,FootLength/2,FootDepth/2])
 		rotate([-90,0,0])
 		rotate_extrude($fn=100)
