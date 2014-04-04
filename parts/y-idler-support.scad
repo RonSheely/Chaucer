@@ -38,21 +38,25 @@ IdlerBracketWidth = 21;
 IdlerBracketThick = 10;
 IdlerFastenerDia = 2.5;
 
+// These points define corners for the 2d face outline of the body.
+
+P1 = [0,ToeLength];
+P2 = [0,ToeLength+BaseLength];
+P3 = [WingWidth+BaseWidth,ToeLength+BaseLength];
+P4 = [WingWidth+BaseWidth,ToeLength];
+P5 = [WingWidth+BaseWidth-ToeIn,0];
+P6 = [WingWidth+ToeIn,0];
+P7 = [WingWidth,ToeLength];
+
 // Place the vertices clockwise, starting from the lower left vertex.
 
 union()
 	{
 	difference()
 		{
+		// Make the body by extruding a 2d polygon.
 		linear_extrude(height = Thick)
-		polygon(points=[
-		[0,ToeLength], // P1
-		[0,ToeLength+BaseLength], // P2
-		[WingWidth+BaseWidth,ToeLength+BaseLength], // P3
-		[WingWidth+BaseWidth,ToeLength], // P4
-		[WingWidth+BaseWidth-ToeIn,0], // P5
-		[WingWidth+ToeIn,0], // P6
-		[WingWidth,ToeLength]]); // P7
+		polygon(points=[P1,P2,P3,P4,P5,P6,P7]);
 	
 		// Make a rounding corner at P2
 		translate([Radius,ToeLength+BaseLength-Radius,0])
