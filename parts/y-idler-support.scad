@@ -54,17 +54,6 @@ union()
 		[WingWidth+ToeIn,0], // P6
 		[WingWidth,ToeLength]]); // P7
 	
-		// Make a rounding corner at P1 - disabled
-		* translate([Radius,Radius+ToeLength,0])
-		rotate([0,0,180])
-		difference()
-			{
-			translate([0,0,-1])
-			cube([Radius+1,Radius+1,Thick+2]);
-			translate([0,0,-2])
-			cylinder(r=Radius,h=Thick+4,$fn=Resolution);
-			}
-
 		// Make a rounding corner at P2
 		translate([Radius,ToeLength+BaseLength-Radius,0])
 		rotate([0,0,90])
