@@ -10,11 +10,8 @@ screws.
 As per OpenScad default, dimensions are in mm and degrees.
 */
 
-// Create a ruler for debug.
+// Include a 3d carpenter square (ruler) library for debug.
 use <ruler.scad>
-% translate([10,10,10])
-rotate([0,0,0])
-xyzruler(30);
 
 // Fillet - Round corners by nophead.
 // Combine with union for inside corners.
@@ -26,8 +23,8 @@ module fillet(r,h)
 		{
 		cube([r + 0.01, r + 0.01, h], center = true);
 		translate([r/2, r/2, 0])
-        cylinder(r = r, h = h + 1, center = true);
-        }
+		cylinder(r = r, h = h + 1, center = true);
+		}
 	}
 
 Thick = 10;
@@ -62,10 +59,16 @@ P5 = [WingWidth+BaseWidth-ToeIn,0];
 P6 = [WingWidth+ToeIn,0];
 P7 = [WingWidth,ToeLength];
 
+// Draw a ruler.
+% translate([0,0,0])
+rotate([0,0,0])
+xyzruler(30);
+
 // Place the vertices clockwise, starting from the lower left vertex.
 
 union()
 	{
+	// Create the body.
 	difference()
 		{
 		// Make the body by extruding a 2d polygon.
@@ -127,7 +130,7 @@ union()
 		cylinder(r=IdlerFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
 	
-	// Weld a block to connect the idler pully bracket to base and toe.
+	// Weld a block to the body to strengthen the idler pully arm.
 	translate([0,ToeLength-IdlerBracketThick,0])
 	cube([WingWidth+ToeIn,Thick+1,Thick]);
 	}
