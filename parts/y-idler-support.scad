@@ -57,9 +57,9 @@ xyzruler(30);
 // Create the body by extruding a 2d polygon,
 // given the vertices and thickness.
 // Place the vertices clockwise, starting from the lower left vertex.
-module body(CornerPoints, Thickness)
+module Body(CornerPoints, Thickness)
 	{
-	color("green") difference()
+	difference()
 		{
 		// Make the body by extruding a 2d polygon.
 		linear_extrude(height = Thickness)
@@ -94,13 +94,10 @@ module body(CornerPoints, Thickness)
 		}
 	}
 
-union()
+// Create the toe bracket.
+module ToeBracket(Thickness)
 	{
-	// Create the body.
-	body([P1,P2,P3,P4,P5,P6,P7],Thick);
-
-	// Weld on the toe bracket.
-	color("blue") difference()
+	difference()
 		{
 		translate([WingWidth+BaseWidth/2-ToeBracketDepth/2,0,0])
 		cube([ToeBracketDepth,ToeBracketThick,ToeBracketWidth+Thick],center = false);
@@ -109,13 +106,16 @@ union()
 		translate([WingWidth+BaseWidth/2,-Thick-ToeBracketWidth/2,-1])
 		cylinder(r=FootFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
+	}
 
-	// Weld on the idler pulley bracket.
+// Create the idler pulley bracket.
+module PulleyBracket(Thick)
+	{
 	rotate([90,0,0])
 	translate([0,0,-ToeDepth])
 	difference()
 		{
-		color("red") union()
+		union()
 			{
 			cube([IdlerBracketWidth,IdlerBracketDepth,IdlerBracketThick],center = false);	
 			translate([IdlerBracketWidth/2,IdlerBracketDepth,0])
@@ -125,5 +125,17 @@ union()
 		translate([IdlerBracketWidth/2,IdlerBracketDepth,-1])
 		cylinder(r=IdlerFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
+	}
+
+union()
+	{
+	// Create the body.
+	color("green") Body([P1,P2,P3,P4,P5,P6,P7],Thick);
+
+	// Weld on the toe bracket.
+	color("blue") ToeBracket(Thick);
+
+	// Weld on the idler pulley bracket.
+	color("red") PulleyBracket(Thick);
 	}
 
