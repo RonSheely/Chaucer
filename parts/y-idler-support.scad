@@ -31,11 +31,13 @@ ExtrusionWidth = 60;
 ExtrusionDepth = 20;
 
 Thick = 10;
+IdlerBracketThick = Thick;
 BaseWidth = ExtrusionWidth;
 BaseDepth = ExtrusionDepth;
 ToeWidth = 50;
-ToeIn = (BaseWidth-ToeWidth)/2;
 ToeDepth = 22;
+ToeIn = (BaseWidth-ToeWidth)/2;
+LittleToeIn = IdlerBracketThick * ToeIn / ToeDepth;
 WingWidth = 35;
 
 Resolution = 50;
@@ -49,18 +51,17 @@ ToeBracketThick = 8;
 
 IdlerBracketDepth = 21;
 IdlerBracketWidth = 21;
-IdlerBracketThick = 10;
 IdlerFastenerDia = 2.5;
 
 // These points define corners for the 2d face outline of the body.
 
-P1 = [0,ToeDepth];
+P1 = [0,ToeDepth-IdlerBracketThick];
 P2 = [0,ToeDepth+BaseDepth];
 P3 = [WingWidth+BaseWidth,ToeDepth+BaseDepth];
 P4 = [WingWidth+BaseWidth,ToeDepth];
 P5 = [WingWidth+BaseWidth-ToeIn,0];
 P6 = [WingWidth+ToeIn,0];
-P7 = [WingWidth,ToeDepth];
+P7 = [WingWidth+LittleToeIn,ToeDepth-IdlerBracketThick];
 
 // Draw a ruler.
 % translate([0,0,0])
@@ -138,10 +139,5 @@ union()
 		translate([IdlerBracketWidth/2,IdlerBracketDepth,-1])
 		cylinder(r=IdlerFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
-	
-	// Weld a block to the body to strengthen the idler pulley arm.
-	// Make sure the weld goes "deep" into the body to avoid boundry math problems.
-	color("purple") translate([0,ToeDepth-IdlerBracketThick,0])
-	cube([WingWidth+ToeIn,Thick+1,Thick]);
 	}
 
