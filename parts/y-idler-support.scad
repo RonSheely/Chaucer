@@ -13,20 +13,6 @@ All dimensions are mm and degrees unless otherwise specified.
 // Include a 3d carpenter square (ruler) library for debug.
 use <ruler.scad>
 
-// Fillet - Round corners by nophead.
-// Combine with union for inside corners.
-// Combine with difference for outside corners.
-module fillet(r,h)
-	{
-    translate([r/2,r/2,0])
-	difference()
-		{
-		cube([r + 0.01, r + 0.01, h], center = true);
-		translate([r/2, r/2, 0])
-		cylinder(r = r, h = h + 1, center = true);
-		}
-	}
-
 ExtrusionWidth = 60;
 ExtrusionDepth = 20;
 
