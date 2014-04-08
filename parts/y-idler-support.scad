@@ -70,22 +70,20 @@ xyzruler(30);
 // Create the body by extruding a 2d polygon,
 // given the vertices and thickness.
 // Place the vertices clockwise, starting from the lower left vertex.
-// ToDo: Add the mounting holes and rounded edges to this module.
 module body(CornerPoints, Thickness)
 	{
-	// Make the body by extruding a 2d polygon.
-	linear_extrude(height = Thickness)
-	polygon(points = CornerPoints);
-	}
-
-union()
-	{
-	// Create the body.
-	difference()
+	color("green") difference()
 		{
 		// Make the body by extruding a 2d polygon.
-		body([P1,P2,P3,P4,P5,P6,P7],Thick);
-	
+		linear_extrude(height = Thickness)
+		polygon(points = CornerPoints);
+
+		// Drill holes for the mounting fasteners.
+		translate([WingWidth+BaseWidth-ExtrusionDepth/2,ToeDepth+BaseDepth-ExtrusionDepth/2,-1])
+		cylinder(r=BaseFastenerDia/2,h=Thick+2,$fn=Resolution);
+		translate([WingWidth+BaseWidth-ExtrusionDepth/2-ExtrusionDepth*2,ToeDepth+BaseDepth-ExtrusionDepth/2,-1])
+		cylinder(r=BaseFastenerDia/2,h=Thick+2,$fn=Resolution);
+
 		// Make a rounding corner at P2
 		translate([Radius,ToeDepth+BaseDepth-Radius,0])
 		rotate([0,0,90])
@@ -96,7 +94,6 @@ union()
 			translate([0,0,-2])
 			cylinder(r=Radius,h=Thick+4,$fn=Resolution);
 			}
-	
 		// Make a rounding corner at P3
 		translate([WingWidth+BaseWidth-Radius,ToeDepth+BaseDepth-Radius,0])
 		rotate([0,0,0])
@@ -107,16 +104,16 @@ union()
 			translate([0,0,-2])
 			cylinder(r=Radius,h=Thick+4,$fn=Resolution);
 			}
-	
-		// Drill holes for the mounting fasteners.
-		translate([WingWidth+BaseWidth-10,ToeDepth+BaseDepth-10,-1])
-		cylinder(r=BaseFastenerDia/2,h=Thick+4,$fn=Resolution);
-		translate([WingWidth+BaseWidth-10-40,ToeDepth+BaseDepth-10,-1])
-		cylinder(r=BaseFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
+	}
+
+union()
+	{
+	// Create the body.
+	body([P1,P2,P3,P4,P5,P6,P7],Thick);
 
 	// Weld on the toe bracket.
-	difference()
+	color("blue") difference()
 		{
 		translate([WingWidth+BaseWidth/2-ToeBracketDepth/2,0,0])
 		cube([ToeBracketDepth,ToeBracketThick,ToeBracketWidth+Thick],center = false);
@@ -131,21 +128,18 @@ union()
 	translate([0,0,-ToeDepth])
 	difference()
 		{
-		union()
+		color("red") union()
 			{
 			cube([IdlerBracketWidth,IdlerBracketDepth,IdlerBracketThick],center = false);	
 			translate([IdlerBracketWidth/2,IdlerBracketDepth,0])
 			cylinder(r=IdlerBracketWidth/2,h=IdlerBracketThick,$fn=Resolution);
-
-
-
 			}
 		translate([IdlerBracketWidth/2,IdlerBracketDepth,-1])
 		cylinder(r=IdlerFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
 	
 	// Weld a block to the body to strengthen the idler pully arm.
-	translate([0,ToeDepth-IdlerBracketThick,0])
+	color("purple") translate([0,ToeDepth-IdlerBracketThick,0])
 	cube([WingWidth+ToeIn,Thick+1,Thick]);
 	}
 
