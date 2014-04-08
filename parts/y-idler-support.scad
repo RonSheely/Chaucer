@@ -123,7 +123,7 @@ union()
 		cylinder(r=FootFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
 
-	// Weld on the idler pully bracket.
+	// Weld on the idler pulley bracket.
 	rotate([90,0,0])
 	translate([0,0,-ToeDepth])
 	difference()
@@ -134,11 +134,13 @@ union()
 			translate([IdlerBracketWidth/2,IdlerBracketDepth,0])
 			cylinder(r=IdlerBracketWidth/2,h=IdlerBracketThick,$fn=Resolution);
 			}
+		// Drill a hole for the idler pulley.
 		translate([IdlerBracketWidth/2,IdlerBracketDepth,-1])
 		cylinder(r=IdlerFastenerDia/2,h=Thick+4,$fn=Resolution);
 		}
 	
-	// Weld a block to the body to strengthen the idler pully arm.
+	// Weld a block to the body to strengthen the idler pulley arm.
+	// Make sure the weld goes "deep" into the body to avoid boundry math problems.
 	color("purple") translate([0,ToeDepth-IdlerBracketThick,0])
 	cube([WingWidth+ToeIn,Thick+1,Thick]);
 	}
