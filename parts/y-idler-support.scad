@@ -21,36 +21,43 @@ use <ruler.scad>
 gExtrusionWidth = 60;
 gExtrusionDepth = 20;
 
-Thick = 10;
-BaseWidth = gExtrusionWidth;
-BaseDepth = gExtrusionDepth;
-ToeWidth = 50;
-ToeDepth = 22;
-ToeIn = (BaseWidth-ToeWidth)/2;
-LittleToeIn = Thick * ToeIn / ToeDepth;
-WingWidth = 35;
+gThick = 10;
+gBaseWidth = gExtrusionWidth;
+gBaseDepth = gExtrusionDepth;
+gToeWidth = 50;
+gToeDepth = 22;
 
-Resolution = 50;
-FilletRoundRadius = 1;
-BaseFastenerDia = 5;
-FootFastenerDia = 5;
+// gToeIn specifies the taper of the toe defined by the 
+// distanced the toe spreads away from a vertical from
+// the corner apex. Since one apex is closer to the toe
+// floor than the other, we have one "gLitteToeIn" and
+// one regular gToeIn.
+gToeIn = (gBaseWidth-gToeWidth)/2;
+gLittleToeIn = gThick * gToeIn / gToeDepth;
 
-ToeBracketDepth = 30;
-ToeBracketWidth = 16;
+gWingWidth = 35;
 
-IdlerBracketDepth = 21;
-IdlerBracketWidth = 21;
-IdlerFastenerDia = 2.5;
+gResolution = 50;
+gFRRadius = 1;
+gBaseFastenerDia = 5;
+gFootFastenerDia = 5;
+
+gToeBracketDepth = 30;
+gToeBracketWidth = 16;
+
+gIdlerBracketDepth = 21;
+gIdlerBracketWidth = 21;
+gIdlerFastenerDia = 2.5;
 
 // These points define corners for the 2d face outline of the body.
 
-P1 = [0,ToeDepth-Thick];
-P2 = [0,ToeDepth+BaseDepth];
-P3 = [WingWidth+BaseWidth,ToeDepth+BaseDepth];
-P4 = [WingWidth+BaseWidth,ToeDepth];
-P5 = [WingWidth+BaseWidth-ToeIn,0];
-P6 = [WingWidth+ToeIn,0];
-P7 = [WingWidth+LittleToeIn,ToeDepth-Thick];
+gP1 = [0,gToeDepth-gThick];
+gP2 = [0,gToeDepth+gBaseDepth];
+gP3 = [gWingWidth+gBaseWidth,gToeDepth+gBaseDepth];
+gP4 = [gWingWidth+gBaseWidth,gToeDepth];
+gP5 = [gWingWidth+gBaseWidth-gToeIn,0];
+gP6 = [gWingWidth+gToeIn,0];
+gP7 = [gWingWidth+gLittleToeIn,gToeDepth-gThick];
 
 // Draw a ruler.
 % translate([0,0,0])
@@ -60,85 +67,85 @@ xyzruler(30);
 // Create the body by extruding a 2d polygon,
 // given the vertices and thickness.
 // Place the vertices clockwise, starting from the lower left vertex.
-module Body(CornerPoints, Thickness, FRRadius)
+module Body(CornerPoints, Thick, FRRadius)
 	{
 	difference()
 		{
 		// Make the body by extruding a 2d polygon.
-		linear_extrude(height = Thickness)
+		linear_extrude(height = Thick)
 		polygon(points = CornerPoints);
 
 		// Drill holes for the mounting fasteners.
-		translate([WingWidth+BaseWidth-gExtrusionDepth/2,ToeDepth+BaseDepth-gExtrusionDepth/2,-1])
-		cylinder(r=BaseFastenerDia/2,h=Thickness+2,$fn=Resolution);
-		translate([WingWidth+BaseWidth-gExtrusionDepth/2-gExtrusionDepth*2,ToeDepth+BaseDepth-gExtrusionDepth/2,-1])
-		cylinder(r=BaseFastenerDia/2,h=Thickness+2,$fn=Resolution);
+		translate([gWingWidth+gBaseWidth-gExtrusionDepth/2,gToeDepth+gBaseDepth-gExtrusionDepth/2,-1])
+		cylinder(r=gBaseFastenerDia/2,h=Thick+2,$fn=gResolution);
+		translate([gWingWidth+gBaseWidth-gExtrusionDepth/2-gExtrusionDepth*2,gToeDepth+gBaseDepth-gExtrusionDepth/2,-1])
+		cylinder(r=gBaseFastenerDia/2,h=Thick+2,$fn=gResolution);
 
 		// Make a rounding corner at P2
-		translate([FRRadius,ToeDepth+BaseDepth-FRRadius,0])
+		translate([FRRadius,gToeDepth+gBaseDepth-FRRadius,0])
 		rotate([0,0,90])
 		difference()
 			{
 			translate([0,0,-1])
-			cube([FRRadius+1,FRRadius+1,Thickness+2]);
+			cube([FRRadius+1,FRRadius+1,Thick+2]);
 			translate([0,0,-2])
-			cylinder(r=FRRadius,h=Thickness+4,$fn=Resolution);
+			cylinder(r=FRRadius,h=Thick+4,$fn=gResolution);
 			}
 		// Make a rounding corner at P3
-		translate([WingWidth+BaseWidth-FRRadius,ToeDepth+BaseDepth-FRRadius,0])
+		translate([gWingWidth+gBaseWidth-FRRadius,gToeDepth+gBaseDepth-FRRadius,0])
 		rotate([0,0,0])
 		difference()
 			{
 			translate([0,0,-1])
-			cube([FRRadius+1,FRRadius+1,Thickness+2]);
+			cube([FRRadius+1,FRRadius+1,Thick+2]);
 			translate([0,0,-2])
-			cylinder(r=FRRadius,h=Thickness+4,$fn=Resolution);
+			cylinder(r=FRRadius,h=Thick+4,$fn=gResolution);
 			}
 		}
 	}
 
 // Create the toe bracket.
-module ToeBracket(Thickness)
+module ToeBracket(Thick)
 	{
 	difference()
 		{
-		translate([WingWidth+BaseWidth/2-ToeBracketDepth/2,0,0])
-		cube([ToeBracketDepth,Thickness,ToeBracketWidth+Thickness],center = false);
+		translate([gWingWidth+gBaseWidth/2-gToeBracketDepth/2,0,0])
+		cube([gToeBracketDepth,Thick,gToeBracketWidth+Thick],center = false);
 		// Drill a hole for the toe fastener.
 		rotate([-90,0,0])
-		translate([WingWidth+BaseWidth/2,-Thickness-ToeBracketWidth/2,-1])
-		cylinder(r=FootFastenerDia/2,h=Thickness+4,$fn=Resolution);
+		translate([gWingWidth+gBaseWidth/2,-Thick-gToeBracketWidth/2,-1])
+		cylinder(r=gFootFastenerDia/2,h=Thick+4,$fn=gResolution);
 		}
 	}
 
 // Create the idler pulley bracket.
-module PulleyBracket(Thickness)
+module PulleyBracket(Thick)
 	{
 	rotate([90,0,0])
-	translate([0,0,-ToeDepth])
+	translate([0,0,-gToeDepth])
 	difference()
 		{
 		union()
 			{
-			cube([IdlerBracketWidth,IdlerBracketDepth,Thickness],center = false);	
-			translate([IdlerBracketWidth/2,IdlerBracketDepth,0])
-			cylinder(r=IdlerBracketWidth/2,h=Thickness,$fn=Resolution);
+			cube([gIdlerBracketWidth,gIdlerBracketDepth,Thick],center = false);	
+			translate([gIdlerBracketWidth/2,gIdlerBracketDepth,0])
+			cylinder(r=gIdlerBracketWidth/2,h=Thick,$fn=gResolution);
 			}
 		// Drill a hole for the idler pulley.
-		translate([IdlerBracketWidth/2,IdlerBracketDepth,-1])
-		cylinder(r=IdlerFastenerDia/2,h=Thickness+4,$fn=Resolution);
+		translate([gIdlerBracketWidth/2,gIdlerBracketDepth,-1])
+		cylinder(r=gIdlerFastenerDia/2,h=Thick+4,$fn=gResolution);
 		}
 	}
 
 union()
 	{
 	// Create the body.
-	color("green") Body([P1,P2,P3,P4,P5,P6,P7],Thick,FilletRoundRadius);
+	color("green") Body([gP1,gP2,gP3,gP4,gP5,gP6,gP7],gThick,gFRRadius);
 
 	// Weld on the toe bracket.
-	color("blue") ToeBracket(Thick);
+	color("blue") ToeBracket(gThick);
 
 	// Weld on the idler pulley bracket.
-	color("red") PulleyBracket(Thick);
+	color("red") PulleyBracket(gThick);
 	}
 
