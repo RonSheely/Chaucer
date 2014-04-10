@@ -12,7 +12,9 @@ All dimensions are mm and degrees unless otherwise specified.
 ToDo - Add idler pully and toe bracket fillets for strength.
 ToDo - Add a fillet at the inside corner at P7.
 ToDo - Add a round at the outside corner at P1.
-ToDo - Apply globl verses local naming convention.
+ToDo - Apply global verses local naming convention.
+ToDo - Factor out all globals and refactor per functional programming paradigm.
+ToDo - Add fillets and rounds to the toe bracket.
 */
 
 // Include a 3d carpenter square (ruler) library for debug.
@@ -20,26 +22,11 @@ use <ruler.scad>
 
 // ToDo - Fix parametrics so this design works for Misumi 2040 as well.
 gMisumiProfile = [20,60];
-// factored out gExtrusionWidth = gMisumiProfile[1]; // was 60;
-// factored out gExtrusionDepth = gMisumiProfile[0]; // was 20;
 
 gThick = 10;
-// ToDo - Factor out gBaseWidth and gBaseDepth with gExtrusionWidth and gExtrusionDepth;
-// I probably doesn't make sense to solve for Misumi 2020 because the fastener count
-// goes from two to one, and there would be nothing keeping the assembly from spinning about
-// the single fastener axis.
-// factored out gBaseWidth = gMisumiProfile[1]; // was gExtrusionWidth;
-// factored out gBaseDepth = gMisumiProfile[0]; // was gExtrusionDepth;
+
 gToeWidth = 50;
 gToeDepth = 22;
-
-// gToeIn specifies the taper of the toe defined by the 
-// distanced the toe spreads away from a vertical from
-// the corner apex. Since one apex is closer to the toe
-// floor than the other, we have one "gLitteToeIn" and
-// one regular gToeIn.
-gToeIn = (gMisumiProfile[1]-gToeWidth)/2;
-gLittleToeIn = gThick * gToeIn / gToeDepth;
 
 gWingWidth = 35;
 
@@ -56,15 +43,18 @@ gIdlerBracketWidth = 21;
 gIdlerFastenerDia = 2.5;
 
 // These points define corner vertices for the 2d face outline of the body.
+
 // ToDo - Consider creating vertices with a function.
 
-gP1 = [0,gToeDepth-gThick];
+gP1 = [0,gToeDepth];
 gP2 = [0,gToeDepth+gMisumiProfile[0]];
 gP3 = [gWingWidth+gMisumiProfile[1],gToeDepth+gMisumiProfile[0]];
 gP4 = [gWingWidth+gMisumiProfile[1],gToeDepth];
-gP5 = [gWingWidth+gMisumiProfile[1]-gToeIn,0];
-gP6 = [gWingWidth+gToeIn,0];
-gP7 = [gWingWidth+gLittleToeIn,gToeDepth-gThick];
+gP5 = [gWingWidth+gMisumiProfile[1]-(gMisumiProfile[1]-gToeWidth)/2,0];
+gP6 = [gWingWidth+(gMisumiProfile[1]-gToeWidth)/2,0];
+gP7 = [gWingWidth,gToeDepth];
+
+echo("Vertices: ",[gP1,gP2,gP3,gP4,gP5,gP6,gP7]);
 
 // Draw a ruler.
 % translate([0,0,0])
