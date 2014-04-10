@@ -18,12 +18,18 @@ ToDo - Apply globl verses local naming convention.
 // Include a 3d carpenter square (ruler) library for debug.
 use <ruler.scad>
 
-gExtrusionWidth = 60;
-gExtrusionDepth = 20;
+// ToDo - Fix parametrics so this design works for Misumi 2040 as well.
+gMisumiProfile = [20,60];
+// factored out gExtrusionWidth = gMisumiProfile[1]; // was 60;
+// factored out gExtrusionDepth = gMisumiProfile[0]; // was 20;
 
 gThick = 10;
-gBaseWidth = gExtrusionWidth;
-gBaseDepth = gExtrusionDepth;
+// ToDo - Factor out gBaseWidth and gBaseDepth with gExtrusionWidth and gExtrusionDepth;
+// I probably doesn't make sense to solve for Misumi 2020 because the fastener count
+// goes from two to one, and there would be nothing keeping the assembly from spinning about
+// the single fastener axis.
+// factored out gBaseWidth = gMisumiProfile[1]; // was gExtrusionWidth;
+// factored out gBaseDepth = gMisumiProfile[0]; // was gExtrusionDepth;
 gToeWidth = 50;
 gToeDepth = 22;
 
@@ -32,7 +38,7 @@ gToeDepth = 22;
 // the corner apex. Since one apex is closer to the toe
 // floor than the other, we have one "gLitteToeIn" and
 // one regular gToeIn.
-gToeIn = (gBaseWidth-gToeWidth)/2;
+gToeIn = (gMisumiProfile[1]-gToeWidth)/2;
 gLittleToeIn = gThick * gToeIn / gToeDepth;
 
 gWingWidth = 35;
@@ -53,10 +59,10 @@ gIdlerFastenerDia = 2.5;
 // ToDo - Consider creating vertices with a function.
 
 gP1 = [0,gToeDepth-gThick];
-gP2 = [0,gToeDepth+gBaseDepth];
-gP3 = [gWingWidth+gBaseWidth,gToeDepth+gBaseDepth];
-gP4 = [gWingWidth+gBaseWidth,gToeDepth];
-gP5 = [gWingWidth+gBaseWidth-gToeIn,0];
+gP2 = [0,gToeDepth+gMisumiProfile[0]];
+gP3 = [gWingWidth+gMisumiProfile[1],gToeDepth+gMisumiProfile[0]];
+gP4 = [gWingWidth+gMisumiProfile[1],gToeDepth];
+gP5 = [gWingWidth+gMisumiProfile[1]-gToeIn,0];
 gP6 = [gWingWidth+gToeIn,0];
 gP7 = [gWingWidth+gLittleToeIn,gToeDepth-gThick];
 
@@ -77,13 +83,13 @@ module Body(CornerPoints, Thickness, FRRadius)
 		polygon(points = CornerPoints);
 
 		// Drill holes for the mounting fasteners.
-		translate([gWingWidth+gBaseWidth-gExtrusionDepth/2,gToeDepth+gBaseDepth-gExtrusionDepth/2,-1])
+		translate([gWingWidth+gMisumiProfile[1]-gMisumiProfile[0]/2,gToeDepth+gMisumiProfile[0]-gMisumiProfile[0]/2,-1])
 		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=gResolution);
-		translate([gWingWidth+gBaseWidth-gExtrusionDepth/2-gExtrusionDepth*2,gToeDepth+gBaseDepth-gExtrusionDepth/2,-1])
+		translate([gWingWidth+gMisumiProfile[1]-gMisumiProfile[0]/2-gMisumiProfile[0]*2,gToeDepth+gMisumiProfile[0]-gMisumiProfile[0]/2,-1])
 		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=gResolution);
 
 		// Make a rounding corner at P2
-		translate([FRRadius,gToeDepth+gBaseDepth-FRRadius,0])
+		translate([FRRadius,gToeDepth+gMisumiProfile[0]-FRRadius,0])
 		rotate([0,0,90])
 		difference()
 			{
@@ -93,7 +99,7 @@ module Body(CornerPoints, Thickness, FRRadius)
 			cylinder(r=FRRadius,h=Thickness+4,$fn=gResolution);
 			}
 		// Make a rounding corner at P3
-		translate([gWingWidth+gBaseWidth-FRRadius,gToeDepth+gBaseDepth-FRRadius,0])
+		translate([gWingWidth+gMisumiProfile[1]-FRRadius,gToeDepth+gMisumiProfile[0]-FRRadius,0])
 		rotate([0,0,0])
 		difference()
 			{
@@ -110,11 +116,11 @@ module ToeBracket(Thickness)
 	{
 	difference()
 		{
-		translate([gWingWidth+gBaseWidth/2-gToeBracketDepth/2,0,0])
+		translate([gWingWidth+gMisumiProfile[1]/2-gToeBracketDepth/2,0,0])
 		cube([gToeBracketDepth,Thickness,gToeBracketWidth+Thickness],center = false);
 		// Drill a hole for the toe fastener.
 		rotate([-90,0,0])
-		translate([gWingWidth+gBaseWidth/2,-Thickness-gToeBracketWidth/2,-1])
+		translate([gWingWidth+gMisumiProfile[1]/2,-Thickness-gToeBracketWidth/2,-1])
 		cylinder(r=gFootFastenerDia/2,h=Thickness+4,$fn=gResolution);
 		}
 	}
