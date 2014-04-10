@@ -23,7 +23,7 @@ use <ruler.scad>
 // ToDo - Fix parametrics so this design works for Misumi 2040 as well.
 gMisumiProfile = [20,60];
 
-gThick = 10;
+// retired gThick = 10;
 
 gToeWidth = 50;
 gToeDepth = 22;
@@ -46,15 +46,29 @@ gIdlerFastenerDia = 2.5;
 
 // ToDo - Consider creating vertices with a function.
 
-gP1 = [0,gToeDepth];
-gP2 = [0,gToeDepth+gMisumiProfile[0]];
-gP3 = [gWingWidth+gMisumiProfile[1],gToeDepth+gMisumiProfile[0]];
-gP4 = [gWingWidth+gMisumiProfile[1],gToeDepth];
-gP5 = [gWingWidth+gMisumiProfile[1]-(gMisumiProfile[1]-gToeWidth)/2,0];
-gP6 = [gWingWidth+(gMisumiProfile[1]-gToeWidth)/2,0];
-gP7 = [gWingWidth,gToeDepth];
+// Calculate the body corner vertices.
+function vertices(MisumiProfile,WingWidth,ToeWidth,ToeDepth) =
+	[
+	[0,ToeDepth],
+	[0,ToeDepth+MisumiProfile[0]],
+	[WingWidth+MisumiProfile[1],ToeDepth+MisumiProfile[0]],
+	[WingWidth+MisumiProfile[1],ToeDepth],
+	[WingWidth+MisumiProfile[1]-(MisumiProfile[1]-ToeWidth)/2,0],
+	[WingWidth+(MisumiProfile[1]-ToeWidth)/2,0],
+	[WingWidth,ToeDepth]
+	];
 
-echo("Vertices: ",[gP1,gP2,gP3,gP4,gP5,gP6,gP7]);
+// echo("Vertices: ",vertices(MisumiProfile=[20,60],WingWidth=35,ToeWidth=50,ToeDepth=22));
+
+// gP1 = [0,gToeDepth];
+// gP2 = [0,gToeDepth+gMisumiProfile[0]];
+// gP3 = [gWingWidth+gMisumiProfile[1],gToeDepth+gMisumiProfile[0]];
+// gP4 = [gWingWidth+gMisumiProfile[1],gToeDepth];
+// gP5 = [gWingWidth+gMisumiProfile[1]-(gMisumiProfile[1]-gToeWidth)/2,0];
+// gP6 = [gWingWidth+(gMisumiProfile[1]-gToeWidth)/2,0];
+// gP7 = [gWingWidth,gToeDepth];
+
+// echo("Vertices: ",[gP1,gP2,gP3,gP4,gP5,gP6,gP7]);
 
 // Draw a ruler.
 % translate([0,0,0])
@@ -151,4 +165,5 @@ module assembly(CornerPoints,Thickness,FRRadius)
 	}
 
 // Create the assembly.
-assembly(CornerPoints=[gP1,gP2,gP3,gP4,gP5,gP6,gP7],Thickness=gThick,FRRadius=gFRRadius);
+assembly(CornerPoints=vertices(MisumiProfile=[20,60],WingWidth=35,ToeWidth=50,ToeDepth=22),Thickness=10,FRRadius=gFRRadius);
+// was assembly(CornerPoints=[gP1,gP2,gP3,gP4,gP5,gP6,gP7],Thickness=10,FRRadius=gFRRadius);
