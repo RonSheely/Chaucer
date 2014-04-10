@@ -49,7 +49,8 @@ gIdlerBracketDepth = 21;
 gIdlerBracketWidth = 21;
 gIdlerFastenerDia = 2.5;
 
-// These points define corners for the 2d face outline of the body.
+// These points define corner vertices for the 2d face outline of the body.
+// ToDo - Consider creating vertices with a function.
 
 gP1 = [0,gToeDepth-gThick];
 gP2 = [0,gToeDepth+gBaseDepth];
@@ -67,19 +68,19 @@ xyzruler(30);
 // Create the body by extruding a 2d polygon,
 // given the vertices and thickness.
 // Place the vertices clockwise, starting from the lower left vertex.
-module Body(CornerPoints, Thick, FRRadius)
+module Body(CornerPoints, Thickness, FRRadius)
 	{
 	difference()
 		{
 		// Make the body by extruding a 2d polygon.
-		linear_extrude(height = Thick)
+		linear_extrude(height = Thickness)
 		polygon(points = CornerPoints);
 
 		// Drill holes for the mounting fasteners.
 		translate([gWingWidth+gBaseWidth-gExtrusionDepth/2,gToeDepth+gBaseDepth-gExtrusionDepth/2,-1])
-		cylinder(r=gBaseFastenerDia/2,h=Thick+2,$fn=gResolution);
+		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=gResolution);
 		translate([gWingWidth+gBaseWidth-gExtrusionDepth/2-gExtrusionDepth*2,gToeDepth+gBaseDepth-gExtrusionDepth/2,-1])
-		cylinder(r=gBaseFastenerDia/2,h=Thick+2,$fn=gResolution);
+		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=gResolution);
 
 		// Make a rounding corner at P2
 		translate([FRRadius,gToeDepth+gBaseDepth-FRRadius,0])
@@ -87,9 +88,9 @@ module Body(CornerPoints, Thick, FRRadius)
 		difference()
 			{
 			translate([0,0,-1])
-			cube([FRRadius+1,FRRadius+1,Thick+2]);
+			cube([FRRadius+1,FRRadius+1,Thickness+2]);
 			translate([0,0,-2])
-			cylinder(r=FRRadius,h=Thick+4,$fn=gResolution);
+			cylinder(r=FRRadius,h=Thickness+4,$fn=gResolution);
 			}
 		// Make a rounding corner at P3
 		translate([gWingWidth+gBaseWidth-FRRadius,gToeDepth+gBaseDepth-FRRadius,0])
@@ -97,29 +98,29 @@ module Body(CornerPoints, Thick, FRRadius)
 		difference()
 			{
 			translate([0,0,-1])
-			cube([FRRadius+1,FRRadius+1,Thick+2]);
+			cube([FRRadius+1,FRRadius+1,Thickness+2]);
 			translate([0,0,-2])
-			cylinder(r=FRRadius,h=Thick+4,$fn=gResolution);
+			cylinder(r=FRRadius,h=Thickness+4,$fn=gResolution);
 			}
 		}
 	}
 
 // Create the toe bracket.
-module ToeBracket(Thick)
+module ToeBracket(Thickness)
 	{
 	difference()
 		{
 		translate([gWingWidth+gBaseWidth/2-gToeBracketDepth/2,0,0])
-		cube([gToeBracketDepth,Thick,gToeBracketWidth+Thick],center = false);
+		cube([gToeBracketDepth,Thickness,gToeBracketWidth+Thickness],center = false);
 		// Drill a hole for the toe fastener.
 		rotate([-90,0,0])
-		translate([gWingWidth+gBaseWidth/2,-Thick-gToeBracketWidth/2,-1])
-		cylinder(r=gFootFastenerDia/2,h=Thick+4,$fn=gResolution);
+		translate([gWingWidth+gBaseWidth/2,-Thickness-gToeBracketWidth/2,-1])
+		cylinder(r=gFootFastenerDia/2,h=Thickness+4,$fn=gResolution);
 		}
 	}
 
 // Create the idler pulley bracket.
-module PulleyBracket(Thick)
+module PulleyBracket(Thickness)
 	{
 	rotate([90,0,0])
 	translate([0,0,-gToeDepth])
@@ -127,25 +128,31 @@ module PulleyBracket(Thick)
 		{
 		union()
 			{
-			cube([gIdlerBracketWidth,gIdlerBracketDepth,Thick],center = false);	
+			cube([gIdlerBracketWidth,gIdlerBracketDepth,Thickness],center = false);	
 			translate([gIdlerBracketWidth/2,gIdlerBracketDepth,0])
-			cylinder(r=gIdlerBracketWidth/2,h=Thick,$fn=gResolution);
+			cylinder(r=gIdlerBracketWidth/2,h=Thickness,$fn=gResolution);
 			}
 		// Drill a hole for the idler pulley.
 		translate([gIdlerBracketWidth/2,gIdlerBracketDepth,-1])
-		cylinder(r=gIdlerFastenerDia/2,h=Thick+4,$fn=gResolution);
+		cylinder(r=gIdlerFastenerDia/2,h=Thickness+4,$fn=gResolution);
 		}
 	}
 
-union()
+// Create the idler pulley assembly with integrated foot.
+module assembly(CornerPoints,Thickness,FRRadius)
 	{
-	// Create the body.
-	color("green") Body([gP1,gP2,gP3,gP4,gP5,gP6,gP7],gThick,gFRRadius);
+	union()
+		{
+		// Create the body.
+		color("green") Body(CornerPoints,Thickness,FRRadius);
 
-	// Weld on the toe bracket.
-	color("blue") ToeBracket(gThick);
+		// Weld on the toe bracket.
+		color("blue") ToeBracket(Thickness);
 
-	// Weld on the idler pulley bracket.
-	color("red") PulleyBracket(gThick);
+		// Weld on the idler pulley bracket.
+		color("red") PulleyBracket(Thickness);
+		}
 	}
 
+// Create the assembly.
+assembly(CornerPoints=[gP1,gP2,gP3,gP4,gP5,gP6,gP7],Thickness=gThick,FRRadius=gFRRadius);
