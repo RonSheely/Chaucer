@@ -15,36 +15,21 @@ ToDo - Add a round at the outside corner at P1.
 ToDo - Apply global verses local naming convention.
 ToDo - Factor out all globals and refactor per functional programming paradigm.
 ToDo - Add fillets and rounds to the toe bracket.
+ToDo - Fix parametrics so this design works for Misumi 2040 as well.
 */
 
 // Include a 3d carpenter square (ruler) library for debug.
 use <ruler.scad>
 
-// ToDo - Fix parametrics so this design works for Misumi 2040 as well.
 gMisumiProfile = [20,60];
-
-// retired gThick = 10;
-
-gToeWidth = 50;
-gToeDepth = 22;
-
-gWingWidth = 35;
-
-gResolution = 50;
-gFRRadius = 1;
+// gFRRadius = 1;
 gBaseFastenerDia = 5;
 gFootFastenerDia = 5;
-
 gToeBracketDepth = 30;
 gToeBracketWidth = 16;
-
 gIdlerBracketDepth = 21;
 gIdlerBracketWidth = 21;
 gIdlerFastenerDia = 2.5;
-
-// These points define corner vertices for the 2d face outline of the body.
-
-// ToDo - Consider creating vertices with a function.
 
 // Calculate the body corner vertices.
 function vertices(MisumiProfile,WingWidth,ToeWidth,ToeDepth) =
@@ -58,18 +43,6 @@ function vertices(MisumiProfile,WingWidth,ToeWidth,ToeDepth) =
 	[WingWidth,ToeDepth]
 	];
 
-// echo("Vertices: ",vertices(MisumiProfile=[20,60],WingWidth=35,ToeWidth=50,ToeDepth=22));
-
-// gP1 = [0,gToeDepth];
-// gP2 = [0,gToeDepth+gMisumiProfile[0]];
-// gP3 = [gWingWidth+gMisumiProfile[1],gToeDepth+gMisumiProfile[0]];
-// gP4 = [gWingWidth+gMisumiProfile[1],gToeDepth];
-// gP5 = [gWingWidth+gMisumiProfile[1]-(gMisumiProfile[1]-gToeWidth)/2,0];
-// gP6 = [gWingWidth+(gMisumiProfile[1]-gToeWidth)/2,0];
-// gP7 = [gWingWidth,gToeDepth];
-
-// echo("Vertices: ",[gP1,gP2,gP3,gP4,gP5,gP6,gP7]);
-
 // Draw a ruler.
 % translate([0,0,0])
 rotate([0,0,0])
@@ -78,7 +51,7 @@ xyzruler(30);
 // Create the body by extruding a 2d polygon,
 // given the vertices and thickness.
 // Place the vertices clockwise, starting from the lower left vertex.
-module Body(CornerPoints, Thickness, FRRadius)
+module Body(CornerPoints, Thickness, FRRadius, WingWidth,ToeDepth,Resolution)
 	{
 	difference()
 		{
@@ -87,83 +60,83 @@ module Body(CornerPoints, Thickness, FRRadius)
 		polygon(points = CornerPoints);
 
 		// Drill holes for the mounting fasteners.
-		translate([gWingWidth+gMisumiProfile[1]-gMisumiProfile[0]/2,gToeDepth+gMisumiProfile[0]-gMisumiProfile[0]/2,-1])
-		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=gResolution);
-		translate([gWingWidth+gMisumiProfile[1]-gMisumiProfile[0]/2-gMisumiProfile[0]*2,gToeDepth+gMisumiProfile[0]-gMisumiProfile[0]/2,-1])
-		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=gResolution);
+		translate([WingWidth+gMisumiProfile[1]-gMisumiProfile[0]/2,ToeDepth+gMisumiProfile[0]-gMisumiProfile[0]/2,-1])
+		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=Resolution);
+		translate([WingWidth+gMisumiProfile[1]-gMisumiProfile[0]/2-gMisumiProfile[0]*2,ToeDepth+gMisumiProfile[0]-gMisumiProfile[0]/2,-1])
+		cylinder(r=gBaseFastenerDia/2,h=Thickness+2,$fn=Resolution);
 
 		// Make a rounding corner at P2
-		translate([FRRadius,gToeDepth+gMisumiProfile[0]-FRRadius,0])
+		translate([FRRadius,ToeDepth+gMisumiProfile[0]-FRRadius,0])
 		rotate([0,0,90])
 		difference()
 			{
 			translate([0,0,-1])
 			cube([FRRadius+1,FRRadius+1,Thickness+2]);
 			translate([0,0,-2])
-			cylinder(r=FRRadius,h=Thickness+4,$fn=gResolution);
+			cylinder(r=FRRadius,h=Thickness+4,$fn=Resolution);
 			}
 		// Make a rounding corner at P3
-		translate([gWingWidth+gMisumiProfile[1]-FRRadius,gToeDepth+gMisumiProfile[0]-FRRadius,0])
+		translate([WingWidth+gMisumiProfile[1]-FRRadius,ToeDepth+gMisumiProfile[0]-FRRadius,0])
 		rotate([0,0,0])
 		difference()
 			{
 			translate([0,0,-1])
 			cube([FRRadius+1,FRRadius+1,Thickness+2]);
 			translate([0,0,-2])
-			cylinder(r=FRRadius,h=Thickness+4,$fn=gResolution);
+			cylinder(r=FRRadius,h=Thickness+4,$fn=Resolution);
 			}
 		}
 	}
 
 // Create the toe bracket.
-module ToeBracket(Thickness)
+module ToeBracket(Thickness, WingWidth, ToeDepth,Resolution)
 	{
 	difference()
 		{
-		translate([gWingWidth+gMisumiProfile[1]/2-gToeBracketDepth/2,0,0])
+		translate([WingWidth+gMisumiProfile[1]/2-gToeBracketDepth/2,0,0])
 		cube([gToeBracketDepth,Thickness,gToeBracketWidth+Thickness],center = false);
 		// Drill a hole for the toe fastener.
 		rotate([-90,0,0])
-		translate([gWingWidth+gMisumiProfile[1]/2,-Thickness-gToeBracketWidth/2,-1])
-		cylinder(r=gFootFastenerDia/2,h=Thickness+4,$fn=gResolution);
+		translate([WingWidth+gMisumiProfile[1]/2,-Thickness-gToeBracketWidth/2,-1])
+		cylinder(r=gFootFastenerDia/2,h=Thickness+4,$fn=Resolution);
 		}
 	}
 
 // Create the idler pulley bracket.
-module PulleyBracket(Thickness)
+module PulleyBracket(Thickness,ToeDepth,Resolution)
 	{
 	rotate([90,0,0])
-	translate([0,0,-gToeDepth])
+	translate([0,0,-ToeDepth])
 	difference()
 		{
 		union()
 			{
 			cube([gIdlerBracketWidth,gIdlerBracketDepth,Thickness],center = false);	
 			translate([gIdlerBracketWidth/2,gIdlerBracketDepth,0])
-			cylinder(r=gIdlerBracketWidth/2,h=Thickness,$fn=gResolution);
+			cylinder(r=gIdlerBracketWidth/2,h=Thickness,$fn=Resolution);
 			}
 		// Drill a hole for the idler pulley.
 		translate([gIdlerBracketWidth/2,gIdlerBracketDepth,-1])
-		cylinder(r=gIdlerFastenerDia/2,h=Thickness+4,$fn=gResolution);
+		cylinder(r=gIdlerFastenerDia/2,h=Thickness+4,$fn=Resolution);
 		}
 	}
 
 // Create the idler pulley assembly with integrated foot.
-module assembly(CornerPoints,Thickness,FRRadius)
+module assembly()
 	{
 	union()
 		{
 		// Create the body.
-		color("green") Body(CornerPoints,Thickness,FRRadius);
+		color("green") Body(CornerPoints=vertices(MisumiProfile=[20,60],WingWidth=35,ToeWidth=50,ToeDepth=22),Thickness=10,FRRadius=1, WingWidth = 35,ToeDepth = 22,Resolution = 50);
 
 		// Weld on the toe bracket.
-		color("blue") ToeBracket(Thickness);
+		color("blue") ToeBracket(Thickness=10,WingWidth = 35,Resolution = 50);
 
 		// Weld on the idler pulley bracket.
-		color("red") PulleyBracket(Thickness);
+		color("red") PulleyBracket(Thickness=10,ToeDepth = 22,Resolution = 50);
 		}
 	}
 
 // Create the assembly.
-assembly(CornerPoints=vertices(MisumiProfile=[20,60],WingWidth=35,ToeWidth=50,ToeDepth=22),Thickness=10,FRRadius=gFRRadius);
-// was assembly(CornerPoints=[gP1,gP2,gP3,gP4,gP5,gP6,gP7],Thickness=10,FRRadius=gFRRadius);
+assembly();
+
