@@ -22,11 +22,6 @@ ToDo - Fix parametrics so this design works for Misumi 2040 as well.
 use <ruler.scad>
 
 gMisumiProfile = [20,60];
-// gBaseFastenerDia = 5;
-gToeBracketDepth = 30;
-gToeBracketWidth = 16;
-gIdlerBracketDepth = 21;
-gIdlerBracketWidth = 21;
 
 // Calculate the body corner vertices.
 function vertices(MisumiProfile,WingWidth,ToeWidth,ToeDepth) =
@@ -86,21 +81,21 @@ module Body(CornerPoints, Thickness, FRRadius, WingWidth,ToeDepth,Resolution,Fas
 	}
 
 // Create the toe bracket.
-module ToeBracket(Thickness, WingWidth, ToeDepth,Resolution,FastenerDia)
+module ToeBracket(Thickness, WingWidth, ToeDepth,Resolution,FastenerDia,BracketWidth,BracketDepth)
 	{
 	difference()
 		{
-		translate([WingWidth+gMisumiProfile[1]/2-gToeBracketDepth/2,0,0])
-		cube([gToeBracketDepth,Thickness,gToeBracketWidth+Thickness],center = false);
+		translate([WingWidth+gMisumiProfile[1]/2-BracketDepth/2,0,0])
+		cube([BracketDepth,Thickness,BracketWidth+Thickness],center = false);
 		// Drill a hole for the toe fastener.
 		rotate([-90,0,0])
-		translate([WingWidth+gMisumiProfile[1]/2,-Thickness-gToeBracketWidth/2,-1])
+		translate([WingWidth+gMisumiProfile[1]/2,-Thickness-BracketWidth/2,-1])
 		cylinder(r=FastenerDia/2,h=Thickness+4,$fn=Resolution);
 		}
 	}
 
 // Create the idler pulley bracket.
-module PulleyBracket(Thickness,ToeDepth,Resolution,FastenerDia)
+module PulleyBracket(Thickness,ToeDepth,Resolution,FastenerDia,BracketWidth,BracketDepth)
 	{
 	rotate([90,0,0])
 	translate([0,0,-ToeDepth])
@@ -108,12 +103,12 @@ module PulleyBracket(Thickness,ToeDepth,Resolution,FastenerDia)
 		{
 		union()
 			{
-			cube([gIdlerBracketWidth,gIdlerBracketDepth,Thickness],center = false);	
-			translate([gIdlerBracketWidth/2,gIdlerBracketDepth,0])
-			cylinder(r=gIdlerBracketWidth/2,h=Thickness,$fn=Resolution);
+			cube([BracketWidth,BracketDepth,Thickness],center = false);	
+			translate([BracketWidth/2,BracketDepth,0])
+			cylinder(r=BracketWidth/2,h=Thickness,$fn=Resolution);
 			}
 		// Drill a hole for the idler pulley.
-		translate([gIdlerBracketWidth/2,gIdlerBracketDepth,-1])
+		translate([BracketWidth/2,BracketDepth,-1])
 		cylinder(r=FastenerDia/2,h=Thickness+4,$fn=Resolution);
 		}
 	}
@@ -127,10 +122,10 @@ module assembly()
 		color("green") Body(CornerPoints=vertices(MisumiProfile=[20,60],WingWidth=35,ToeWidth=50,ToeDepth=22),Thickness=10,FRRadius=1, WingWidth = 35,ToeDepth = 22,Resolution = 50,FastenerDia = 5);
 
 		// Weld on the toe bracket.
-		color("blue") ToeBracket(Thickness=10,WingWidth = 35,Resolution = 50,FastenerDia=5);
+		color("blue") ToeBracket(Thickness=10,WingWidth = 35,Resolution = 50,FastenerDia=5,BracketWidth = 16,BracketDepth = 30);
 
 		// Weld on the idler pulley bracket.
-		color("red") PulleyBracket(Thickness=10,ToeDepth = 22,Resolution = 50,FastenerDia = 2.5);
+		color("red") PulleyBracket(Thickness=10,ToeDepth = 22,Resolution = 50,FastenerDia = 2.5,BracketWidth = 21,BracketDepth=21);
 		}
 	}
 
