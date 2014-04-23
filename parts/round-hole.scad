@@ -2,18 +2,14 @@
 
 // Defaults
 
-gPosX = 10;
-gPosY = 15;
-gDia = 5;
-gDepth = 10;
 gRes = 50;
 gNudge = 0.01;
 
 module RoundHole(
-	PosX = gPosX,	// drill position x
-	PosY = gPosY,	// drill position y
-	Dia = gDia,		// drill diameter
-	Depth = gDepth,	// drill depth
+	PosX,	// drill position x
+	PosY,	// drill position y
+	Dia,		// drill diameter
+	Depth,	// drill depth
 	Res = gRes,		// render resolution
 	Nudge = gNudge)	// render error compensation
 	{
@@ -21,4 +17,4 @@ module RoundHole(
 	cylinder(h = Nudge + Depth + Nudge, d = Dia, $fn = Res);
 	}
 
-RoundHole();
+RoundHole(10,15,5,10);
