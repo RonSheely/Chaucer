@@ -11,10 +11,7 @@ module SquareBracket(
     DimX,           // width
     DimY,           // length
     DimZ,           // thickness
-    //FastenerPosX,   // fastener width position
-    //FastenerPosY,   // fastener length position
-    //FastenerDia,    // fastener diameter
-	DrillSched,   // drill schedule list, [[PosX,PosY,Dia,Depth],...]
+	DrillSched,     // drill schedule list, [[PosX,PosY,Dia,Depth],...]
     Res = gRes,     // render resolution
     Nudge = gNudge) // render error compensation
 	{
@@ -25,6 +22,8 @@ module SquareBracket(
 		RoundHoles(DrillSched);
 		}
 	}
+
+// Demo
 
 SquareBracket(20,30,10, [[5,5,5,10],[5,25,5,10],[15,25,5,10],[15,5,5,10]]);
 
