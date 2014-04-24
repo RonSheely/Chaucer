@@ -17,12 +17,11 @@ ToDo - Fix parametrics so this design works for Misumi 2040 as well.
 */
 
 // Include a 3d carpenter square (ruler) library for debug.
-use <ruler.scad>
+use <ruler.scad>;
+use <round-bracket.scad>;
 
 // Draw a ruler.
-% translate([0,0,0])
-rotate([0,0,0])
-xyzruler(30);
+% xyzruler(32);
 
 // Create the body by extruding a 2d polygon,
 // given the vertices and thickness.
@@ -90,7 +89,12 @@ module PulleyBracket(Thickness,ToeDepth,Resolution,FastenerDia,BracketWidth,Brac
 	{
 	rotate([90,0,0])
 	translate([0,0,-ToeDepth])
-	difference()
+	RoundBracket(
+		BracketWidth,
+		BracketDepth+BracketWidth/2,
+		Thickness,
+		[[BracketWidth/2,BracketDepth,FastenerDia,Thickness]]);
+	/* difference()
 		{
 		union()
 			{
@@ -101,7 +105,7 @@ module PulleyBracket(Thickness,ToeDepth,Resolution,FastenerDia,BracketWidth,Brac
 		// Drill a hole for the idler pulley.
 		translate([BracketWidth/2,BracketDepth,-1])
 		cylinder(r=FastenerDia/2,h=Thickness+4,$fn=Resolution);
-		}
+		} */
 	}
 
 // Create the idler pulley assembly with integrated foot.
@@ -110,16 +114,41 @@ module assembly()
 	union()
 		{
 		// Create the body.
-		color("green") Body(MisumiProfile=[20,60],Thickness=10,FRRadius=1, WingWidth = 35,ToeWidth = 50, ToeDepth = 22,Resolution = 50,FastenerDia = 5);
+		color("green")
+		Body(
+			MisumiProfile=[20,60],
+			Thickness=10,
+			FRRadius=1,
+			WingWidth = 35,
+			ToeWidth = 50,
+			ToeDepth = 22,
+			Resolution = 50,
+			FastenerDia = 5);
 
 		// Weld on the toe bracket.
-		color("blue") ToeBracket(MisumiProfile=[20,60],Thickness=10,WingWidth = 35,Resolution = 50,FastenerDia=5,BracketWidth = 16,BracketDepth = 30);
+		color("blue")
+		ToeBracket(
+			MisumiProfile=[20,60],
+			Thickness=10,
+			WingWidth = 35,
+			Resolution = 50,
+			FastenerDia=5,
+			BracketWidth = 16,
+			BracketDepth = 30);
 
 		// Weld on the idler pulley bracket.
-		color("red") PulleyBracket(Thickness=10,ToeDepth = 22,Resolution = 50,FastenerDia = 2.5,BracketWidth = 21,BracketDepth=21);
+		color("red")
+		PulleyBracket(
+			Thickness=10,
+			ToeDepth = 22,
+			Resolution = 50,
+			FastenerDia = 2.5,
+			BracketWidth = 21,
+			BracketDepth=21);
 		}
 	}
 
 // Create the assembly.
+
 assembly();
 
