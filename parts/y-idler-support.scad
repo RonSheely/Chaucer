@@ -14,11 +14,13 @@ ToDo - Add a fillet at the inside corner at P7.
 ToDo - Add a round at the outside corner at P1.
 ToDo - Add fillets and rounds to the toe bracket.
 ToDo - Fix parametrics so this design works for Misumi 2040 as well.
+Revisit - Consider a more readabile dimension scheme.
 */
 
 // Include a 3d carpenter square (ruler) library for debug.
 use <ruler.scad>;
 use <round-bracket.scad>;
+use <square-bracket.scad>;
 
 // Draw a ruler.
 % xyzruler(32);
@@ -26,9 +28,17 @@ use <round-bracket.scad>;
 // Create the body by extruding a 2d polygon,
 // given the vertices and thickness.
 // Place the vertices clockwise, starting from the lower left vertex.
-module Body(MisumiProfile, Thickness, FRRadius, WingWidth,ToeWidth, ToeDepth,Resolution,FastenerDia)
+module Body(
+	MisumiProfile,
+	Thickness,
+	FRRadius,
+	WingWidth,
+	ToeWidth,
+	ToeDepth,
+	Resolution,
+	FastenerDia)
 	{
-	difference()
+	color("green") difference()
 		{
 		// Make the body by extruding a 2d polygon.
 		linear_extrude(height = Thickness)
@@ -71,9 +81,28 @@ module Body(MisumiProfile, Thickness, FRRadius, WingWidth,ToeWidth, ToeDepth,Res
 	}
 
 // Create the toe bracket.
-module ToeBracket(MisumiProfile,Thickness, WingWidth, ToeDepth,Resolution,FastenerDia,BracketWidth,BracketDepth)
+module ToeBracket(
+	MisumiProfile,
+	Thickness,
+	WingWidth,
+	ToeDepth,
+	Resolution,
+	FastenerDia,
+	BracketWidth,
+	BracketDepth)
 	{
-	difference()
+	color("blue")
+	rotate([-90,0,0])
+	translate([
+		WingWidth+MisumiProfile[1]/2-BracketDepth/2,
+		-Thickness-BracketWidth,
+		0])
+	SquareBracket(
+		BracketDepth,
+		BracketWidth,
+		Thickness,
+		[[BracketDepth/2,BracketWidth/2,FastenerDia,Thickness]]);
+	/* color("blue") difference()
 		{
 		translate([WingWidth+MisumiProfile[1]/2-BracketDepth/2,0,0])
 		cube([BracketDepth,Thickness,BracketWidth+Thickness],center = false);
@@ -81,15 +110,21 @@ module ToeBracket(MisumiProfile,Thickness, WingWidth, ToeDepth,Resolution,Fasten
 		rotate([-90,0,0])
 		translate([WingWidth+MisumiProfile[1]/2,-Thickness-BracketWidth/2,-1])
 		cylinder(r=FastenerDia/2,h=Thickness+4,$fn=Resolution);
-		}
+		} */
 	}
 
 // Create the idler pulley bracket.
-module PulleyBracket(Thickness,ToeDepth,Resolution,FastenerDia,BracketWidth,BracketDepth)
+module PulleyBracket(
+	Thickness,
+	ToeDepth,
+	Resolution,
+	FastenerDia,
+	BracketWidth,
+	BracketDepth)
 	{
 	rotate([90,0,0])
 	translate([0,0,-ToeDepth])
-	RoundBracket(
+	color("red") RoundBracket(
 		BracketWidth,
 		BracketDepth+BracketWidth/2,
 		Thickness,
@@ -114,7 +149,6 @@ module assembly()
 	union()
 		{
 		// Create the body.
-		color("green")
 		Body(
 			MisumiProfile=[20,60],
 			Thickness=10,
@@ -126,7 +160,6 @@ module assembly()
 			FastenerDia = 5);
 
 		// Weld on the toe bracket.
-		color("blue")
 		ToeBracket(
 			MisumiProfile=[20,60],
 			Thickness=10,
@@ -137,7 +170,6 @@ module assembly()
 			BracketDepth = 30);
 
 		// Weld on the idler pulley bracket.
-		color("red")
 		PulleyBracket(
 			Thickness=10,
 			ToeDepth = 22,
@@ -149,6 +181,5 @@ module assembly()
 	}
 
 // Create the assembly.
-
 assembly();
 
