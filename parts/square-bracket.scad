@@ -17,8 +17,7 @@ module SquareBracket(
 	{
 	difference()
 		{
-		color("green") cube([DimX, DimY, DimZ]);
-		color("red")
+		cube([DimX, DimY, DimZ]);
 		RoundHoles(DrillSched);
 		}
 	}

@@ -21,13 +21,10 @@ module RoundBracket(
 		{
 		union()
 			{
-			color("green")
 			cube([Dia, DimY-Dia/2, DimZ]);
-			color("blue")
 			translate([Dia/2,DimY-Dia/2,0])
 			RoundKey(Dia,Dia/2,DimZ);
 			}
-		color("red")
 		RoundHoles(DrillSched);
 		}
 	}
