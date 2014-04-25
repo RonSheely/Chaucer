@@ -21,6 +21,7 @@ Revisit - Consider a more readabile dimension scheme.
 use <ruler.scad>;
 use <round-bracket.scad>;
 use <square-bracket.scad>;
+use <round-holes.scad>;
 
 // Draw a ruler.
 % xyzruler(32);
@@ -52,10 +53,31 @@ module Body(
 			[WingWidth,ToeDepth]]);
 
 		// Drill holes for the mounting fasteners.
-		translate([WingWidth+MisumiProfile[1]-MisumiProfile[0]/2,ToeDepth+MisumiProfile[0]-MisumiProfile[0]/2,-1])
-		cylinder(r=FastenerDia/2,h=Thickness+2,$fn=Resolution);
-		translate([WingWidth+MisumiProfile[1]-MisumiProfile[0]/2-MisumiProfile[0]*2,ToeDepth+MisumiProfile[0]-MisumiProfile[0]/2,-1])
-		cylinder(r=FastenerDia/2,h=Thickness+2,$fn=Resolution);
+		RoundHoles([
+			[WingWidth+MisumiProfile[1]-MisumiProfile[0]/2,
+			ToeDepth+MisumiProfile[0]-MisumiProfile[0]/2,
+			FastenerDia,
+			Thickness],
+			[WingWidth+MisumiProfile[1]-MisumiProfile[0]/2-MisumiProfile[0]*2,
+			ToeDepth+MisumiProfile[0]-MisumiProfile[0]/2,
+			FastenerDia,
+			Thickness]]);
+		/* translate(
+			[WingWidth+MisumiProfile[1]-MisumiProfile[0]/2,
+			ToeDepth+MisumiProfile[0]-MisumiProfile[0]/2,
+			-1])
+		cylinder(
+			r=FastenerDia/2,
+			h=Thickness+2,
+			$fn=Resolution);
+		translate(
+			[WingWidth+MisumiProfile[1]-MisumiProfile[0]/2-MisumiProfile[0]*2,
+			ToeDepth+MisumiProfile[0]-MisumiProfile[0]/2,
+			-1])
+		cylinder(
+			r=FastenerDia/2,
+			h=Thickness+2,
+			$fn=Resolution); */
 
 		// Make a rounding corner at P2
 		translate([FRRadius,ToeDepth+MisumiProfile[0]-FRRadius,0])
